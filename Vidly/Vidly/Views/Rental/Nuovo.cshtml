@@ -1,0 +1,141 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Nuovo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Nuova Richiesta Films</h2>
+
+<form id="nuovoRental">
+    <div class="form-group">
+        <label>Cliente</label>
+        <div class="tt-container">
+            <input id="cliente" name = "clienti" data-rule-clienteValido = "true" required type="text" value="" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Film</label>
+        <div class="tt-container">
+            <input id="film" name ="films" data-rule-almenoUnFilm = "true" type="text" value="" class="form-control" />
+         </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <ul id="films" class="form-group list-group"></ul>
+        </div>
+    </div>
+        <button class="btn btn-primary">Invia</button>
+</form>
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+
+            var vm = { FilmsIds: [] };
+
+            var clienti = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('nome'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/api/clienti?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('#cliente').typeahead({
+                minLength: 3,
+                highlight: true
+            }, {
+                name: 'clienti',
+                display: 'nome',
+                source: clienti
+                }).on("typeahead:select", function (e, cliente) {
+                    vm.ClienteId = cliente.id;
+                });
+
+
+            var nuovaDisponibilità = 0;
+           
+         
+            var films = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('nome'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/api/films?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            
+            $.validator.addMethod("almenoUnFilm", function () {
+                return vm.FilmsIds.length > 0;
+            },"Selezionare almeno un film");
+
+            $('#film').typeahead({
+                minLength: 3,
+                highlight: true
+            }, {
+                    name: 'films',
+                    display: 'nome',
+                    source: films
+                }).on("typeahead:select", function (e, film) {
+
+                    var aggDisponibilità = film.disponibilità - nuovaDisponibilità
+
+                    if (film.disponibilità == 0) {
+
+                        toastr.error("Il film selezionato al momento non è disponibile.");
+                        $("#film").typeahead("val", "");
+
+                    }
+                    else {
+
+                        if (aggDisponibilità > 0) {
+
+                            $("#films").append("<li class= 'list-group-item'>" + film.nome + "</li>");
+                            $("#film").typeahead("val", "");
+
+                            nuovaDisponibilità++;
+
+                            vm.FilmsIds.push(film.id);
+
+                        }
+                        else {
+                            toastr.error("Il film selezionato è terminato");
+                            $("#film").typeahead("val", "");
+                        }
+                    }
+                   
+                });
+
+            $.validator.addMethod("clienteValido", function () {
+                return vm.ClienteId && vm.ClienteId != 0;
+            }, "Selezionare un cliente valido");
+
+            var validator = $("#nuovoRental").validate({
+                submitHandler: function () {
+                    $.ajax({
+                        url: "/api/rental",
+                        method: "post",
+                        data: vm
+
+                    }).done(function () {
+                        toastr.success("Rental registrato correttamente");
+                        $("#cliente").typeahead("val", "");
+                        $("#film").typeahead("val", "");
+                        $("#films").empty();
+
+                        vm = { FilmsIds: [] };
+                        validator.resetForm();
+
+                    }).fail(function () { toastr.error("Errore inaspettato"); });
+
+                    return false;
+                }
+            });
+          
+        });
+    </script>
+    }

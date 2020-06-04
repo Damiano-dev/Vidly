@@ -1,0 +1,18 @@
+﻿@model Vidly.Models.Cliente
+@{
+    ViewBag.Title = "Dettagli";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Model.Nome</h2>
+
+<ul>
+    <li>Tipo abbonamento : @Model.TipoAbbonamento.Tipo</li>
+
+    @if (Model.dataDiNascita != null)
+    {
+        <li>Data di nascita : @string.Format("{0:dd/ MM / yyyy}", Model.dataDiNascita)</li>
+    }
+
+</ul>
+

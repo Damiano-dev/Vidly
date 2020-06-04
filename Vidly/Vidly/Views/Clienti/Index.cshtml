@@ -1,0 +1,66 @@
+﻿@model IEnumerable<Vidly.Models.Cliente>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Clienti</h2>
+
+
+   <table id="clienti" class="table table-bordered table-hover tab">
+       <thead>
+           <tr>
+               <th>Nome</th>
+               <th>Tipo di abbonamento</th>
+               <th>Cancella</th>
+           </tr>
+       </thead>
+       <tbody>
+
+       </tbody>
+   </table>
+   <button class="btn btn-primary" onclick="location.href='@Url.Action("NuovoCliente","Clienti")'">Nuovo Cliente</button>
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var table = $("#clienti").DataTable({
+                "language": {
+                    url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Italian.json"
+                },
+                ajax: {
+                    url: "/api/clienti",
+                    dataSrc: ""
+
+                },
+                columns: [{
+                    data: "nome",
+                    render: function (data, type, cliente) { return "<a href='/clienti/modifica/" + cliente.id + "'>" + data + "</a>";}
+                },
+                    {
+                        data :"tipoAbbonamento.tipo"
+                    },
+                    {
+                        data: "id",
+                        render: function (data)
+                        {
+                            return "<button class='btn-link js-delete' data-cliente-id=" + data + ">Cancella</button>";
+                        }
+                    }
+                ]
+            });
+            $("#clienti").on("click",".js-delete", function () { var button = $(this)
+                if (confirm("Sei sicuro di voler cancellare il cliente selezionato?")) {
+                    $.ajax({ 
+                        url: "/api/clienti/" + button.attr("data-cliente-id"),
+                        method: "DELETE",
+                        success: function () {
+                            table.row(button.parents("tr")).remove().draw();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

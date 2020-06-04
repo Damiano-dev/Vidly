@@ -1,0 +1,77 @@
+﻿@model List<Vidly.Models.Film>
+@{
+    ViewBag.Title = "Casuale";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Films</h2>
+
+@*
+    var PopOrNot = Model.clienti.Count > 0 ? "popular" : "unpopular";
+*@
+
+@if (!Model.Any())
+{
+    <p>"Non ci sono film!"</p>
+}
+else
+{
+    @*
+        <div class="row">
+        <div class="col-md-6">
+            Damiano
+        </div>
+        <div class="col-md-6">
+            Crecco
+        </div>
+      </div>
+    *@
+
+    <table id ="films" class="table table-bordered table-hover tab">
+        <thead>
+            <tr>
+                <th>Titolo</th>
+                <th>Genere</th>
+            </tr>
+        </thead>
+    </table>
+}
+
+@*
+        <ul class="@PopOrNot" style="background-color:aqua">
+        @foreach (var cliente in Model.)
+        {
+            <li>@cliente.Nome</li>
+        }
+    </ul>
+*@
+
+@section scripts
+    {
+    <script>
+        $(document).ready(function () {
+            var table = $("#films").DataTable({
+                "language": {
+                    url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Italian.json"
+                },
+                ajax: {
+                    url: "/api/films",
+                    dataSrc: ""
+
+                },
+                columns: [{
+                    data: "nome"
+                },
+                {
+                    data: "genere.nome"
+                }
+              
+                
+                ]
+            });
+
+        });
+    </script>
+    }
+
+

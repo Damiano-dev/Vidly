@@ -1,0 +1,90 @@
+﻿@model Vidly.ViewModels.FormFilmsViewModel
+@{
+    /**/
+
+    ViewBag.Title = "FormFilm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Model.Titolo</h2>
+
+@using (Html.BeginForm("Save", "Films"))
+{
+   
+    @Html.ValidationSummary(true, "Si prega di correggere gli errori")
+<div class="row" style="border: 2px solid #2780e3 ; padding:15px 0 0 6px; border-radius:25px; background:linear-gradient(to right,rgba(255,255,255,0.6) 100%, rgba(255,255,255,1)),url(../../Content/disegno.jpg) ; background-size:auto">
+
+    <div class="form-group col-md-6">
+        @Html.LabelFor(m => m.Nome)
+        <div class="form-group">
+            @Html.TextBoxFor(m => m.Nome, new { @class = "Form-control" })
+            @Html.ValidationMessageFor(m => m.Nome)
+        </div>
+    </div>
+    <div class="form-group col-md-6">
+        @Html.LabelFor(m => m.ReleaseDate)
+        <div class="form-group">
+            @Html.TextBoxFor(m => m.ReleaseDate, "{0:dd/MM/yyyy}", new { @class = "Form-control" })
+            @Html.ValidationMessageFor(m => m.ReleaseDate)
+        </div>
+    </div>
+    <div class="form-group col-md-6">
+        @Html.LabelFor(m => m.Idgenere)
+        <div class="form-group">
+            @Html.DropDownListFor(m => m.Idgenere, new SelectList(Model.Generi.ToList(), "Id", "Nome"), "Selezionare un genere", new { @class = "Form-control" })
+            @Html.ValidationMessageFor(m => m.Idgenere)
+        </div>
+    </div>
+    <div class="form-group col-md-6">
+        @Html.LabelFor(m => m.NumeroInStock)
+        <div class="form-group">
+            @Html.TextBoxFor(m => m.NumeroInStock, new { @class = "Form-control" })
+            @Html.ValidationMessageFor(m => m.NumeroInStock)
+        </div>
+    </div>
+    @if (Model.Id == 0)
+    {
+        for (int i = 0; i < Model.ImageLists.Count; i++)
+        {
+            <div class="form-group">
+                <label class="control-label col-md-2">Immagine film @(i + 1):</label>
+                <div class="form-group">
+                    @Html.DropDownListFor(vm => vm.FilmImages, Model.ImageLists[i], "Scegli un'immagine",
+                    htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ImageLists, "", new { @class = "textdanger"
+                    })
+                </div>
+            </div>
+        }
+
+    }
+    else
+    {
+        if (Model.MappingImmaginiFilms != null && Model.MappingImmaginiFilms.Any())
+        {
+            <dl>
+                <dt>
+                    <img src="@(Url.Content(Costanti.IndirizzoImmagineProdotto) +Model.MappingImmaginiFilms.OrderBy(pim =>pim.ImageNumber).ElementAt(0).ImmagineFilm.NomeFile)" style=padding:5px>
+                </dt>
+                <dd>
+                    @foreach (var item in Model.MappingImmaginiFilms.OrderBy(pim => pim.ImageNumber))
+                    {
+                        <a href="@(Url.Content(Costanti.IndirizzoImmagineProdotto) +item.ImmagineFilm.NomeFile)">
+                            <img src="@(Url.Content(Costanti.ProductThumbnailPath) +item.ImmagineFilm.NomeFile)" style=padding:5px>
+                        </a>
+                    }
+                </dd>
+            </dl>
+        }
+    }
+    @Html.HiddenFor(m => m.Id)
+    @Html.AntiForgeryToken()
+    <div class="form-group col-md-6">
+        <button class="btn btn-primary" style="width:200px" type="submit">Salva</button>
+    </div>
+</div>
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+}

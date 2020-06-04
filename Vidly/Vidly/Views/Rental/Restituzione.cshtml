@@ -1,0 +1,106 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Restituzione";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Restituzione films</h2>
+
+<form id="formRestituzioni">
+
+    <div class="form-group">
+        <label>Nome Cliente</label>
+        <div class="tt-container">
+            <input id="cliente" name="clienti"  type="text" value="" class="form-control" />
+        </div>
+    </div>
+    
+</form>
+
+<table id="tabellaFilms" class="table table-bordered table-hover tab" hidden="hidden">
+    <thead>
+        <tr>
+            <th>Titolo Film</th>
+            <th>Restituisci</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            var vm = {};
+            var table = $("#tabellaFilms");
+
+            var clienti = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('nome'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/api/clienti?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('#cliente').typeahead({
+                minLength: 3,
+                highlight: true
+            }, {
+                    name: 'clienti',
+                    display: 'nome',
+                    source: clienti
+                }).on("typeahead:select", function (e, cliente) {
+
+                    if ($.fn.dataTable.isDataTable(table)) {
+
+                        table.DataTable().ajax.url("/api/rental/" + cliente.nome).load();
+                    }
+                    else {
+
+                        table.show().DataTable({
+                            searching: false,
+                            "language": {
+                                url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Italian.json"
+                            },
+                            ajax: {
+                                url: "/api/rental/" + cliente.nome,
+                                dataSrc: "",
+                            },
+                            columns: [{
+                                data: "nome"
+                            },
+                            {
+                                data: "id",
+                                render: function (data) {
+                                    return "<button class='btn-link js-delete' data-cliente-id=" + data + ">Restituisci</button>";
+                                }
+
+                            }
+                            ]
+                        });
+                    }
+                });
+
+            table.on("click", ".js-delete", function () {
+
+                var button = $(this)
+                if (confirm("Vuoi restituire il film?")) {
+                    $.ajax({
+                        url: "/api/rental/" + button.attr("data-cliente-id"),
+                        method: "DELETE",
+                        success: function () {
+                            table.DataTable().row(button.parents("tr")).remove().draw();
+                        }
+                    }).done(function () {
+                        toastr.success("Restituzione Avvenuta correttamente");
+                    });                
+                }
+            });
+
+        });
+    </script>
+    }

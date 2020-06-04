@@ -1,0 +1,102 @@
+﻿@model List<Vidly.Models.Film>
+@{
+    ViewBag.Title = "Casuale";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Films</h2>
+
+@*
+    var PopOrNot = Model.clienti.Count > 0 ? "popular" : "unpopular";
+*@
+
+@if (!Model.Any())
+{
+    <p>"Non ci sono film!"</p>
+}
+else
+{
+    @*
+        <div class="row">
+        <div class="col-md-6">
+            Damiano
+        </div>
+        <div class="col-md-6">
+            Crecco
+        </div>
+      </div>
+    *@
+
+    <table id ="films" class="table table-bordered table-hover tab">
+        <thead>
+            <tr>
+                <th>Titolo</th>
+                <th>Genere</th>
+                <th>Disponibilità</th>
+                <th>Cancella</th>
+            </tr>
+        </thead>
+      
+    </table>
+    <button class="btn btn-primary" onclick="location.href='@Url.Action("NuovoFilm","Films")'">Nuovo Film</button>
+}
+
+@*
+        <ul class="@PopOrNot" style="background-color:aqua">
+        @foreach (var cliente in Model.)
+        {
+            <li>@cliente.Nome</li>
+        }
+    </ul>
+*@
+
+@section scripts
+    {
+    <script>
+        $(document).ready(function () {
+            var table = $("#films").DataTable({
+                "language": {
+                    url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Italian.json"
+                },
+                ajax: {
+                    url: "/api/films",
+                    dataSrc: ""
+
+                },
+                columns: [
+                {
+                    data: "nome",
+                    render: function (data, type, film) { return "<a href='/films/modifica/" + film.id + "'>" + data + "</a>"; }
+                },
+                {
+                    data: "genere.nome"
+                },
+                {
+                    data: "disponibilità"
+                },
+                {
+                    data: "id",
+                    render: function (data) {
+                        return "<button class='btn-link js-delete' data-film-id=" + data + ">Cancella</button>";
+                    }
+                }
+                ]
+            });
+            $("#films").on("click", ".js-delete", function () {
+                var button = $(this)
+                if (confirm("Sei sicuro di voler cancellare il film selezionato?")) {
+                    $.ajax({
+                        url: "/api/films/" + button.attr("data-film-id"),
+                        method: "DELETE",
+                        success: function () {
+                            table.row(button.parents("tr")).remove().draw();
+                        }
+                    });
+                }
+            });
+
+        });
+    </script>
+    }
+
+

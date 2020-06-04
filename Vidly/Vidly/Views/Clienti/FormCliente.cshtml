@@ -1,0 +1,57 @@
+﻿@model Vidly.ViewModels.FormClienteViewModel
+@{
+    ViewBag.Title = "Nuovo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model.Cliente == null)
+{
+    <h2>Nuovo cliente</h2>
+}
+else
+{
+    <h2>Modifica cliente</h2>
+}
+
+
+@using (Html.BeginForm("Salva", "Clienti"))
+{
+    @Html.ValidationSummary(true, "Si prega di correggere gli errori")
+    <div class="row" style="border: 2px solid blue; padding:15px 0 0 6px; border-radius:25px">
+        <div class="form-group col-md-6">
+            @Html.LabelFor(n => n.Cliente.Nome)
+            <div>
+                @Html.TextBoxFor(n => n.Cliente.Nome, new { @class = "Form-control" })
+                @Html.ValidationMessageFor(n => n.Cliente.Nome)
+            </div>
+        </div>
+        <div class="form-group col-md-6">
+            @Html.LabelFor(n => n.Cliente.dataDiNascita)
+            <div>
+                @Html.TextBoxFor(n => n.Cliente.dataDiNascita, "{0:dd/MM/yyyy}", new { @class = "form-control" })
+                @Html.ValidationMessageFor(n => n.Cliente.dataDiNascita)
+            </div>
+        </div>
+        <div class="form-group col-md-6">
+            @Html.LabelFor(n => n.Cliente.TipoAbbonamento)
+            <div>
+                @Html.DropDownListFor(n => n.Cliente.IdAbbonamento, new SelectList(Model.VMAbbonamenti, "Id", "Tipo"), "Selezionare un abbonamento", new { @class = "Form-control" })
+            </div>
+        </div>
+        <div class="checkbox col-md-6">
+            <label>
+                @Html.CheckBoxFor(n => n.Cliente.IscrittoAllaNewsletter, new { @class = "Form-control" }) Iscritto alla newsletter?
+            </label>
+        </div>
+        @Html.HiddenFor(n => n.Cliente.Id)
+        @Html.AntiForgeryToken()
+        <div class="form-group col-md-12" style="padding:15px">
+            <button class="btn btn-primary" style="width:200px" type="submit">Salva</button>
+        </div>
+    </div>
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    
+}
