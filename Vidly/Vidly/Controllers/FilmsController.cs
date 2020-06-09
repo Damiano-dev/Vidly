@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -55,7 +56,7 @@ namespace Vidly.Controllers
         //    return View(filmScelto);
         //}
 
-        [Authorize(Roles =RoleName.CanManageMovies)]
+        //[Authorize(Roles =RoleName.CanManageMovies)]
         public ActionResult NuovoFilm()
         {
             FormFilmsViewModel viewModel = new FormFilmsViewModel()
@@ -89,14 +90,9 @@ namespace Vidly.Controllers
                 return View("FIlmForm", filmViewModel);                  //viewModel);
             }
 
-            Film film = new Film();
+            Film film = Mapper.Map<FormFilmsViewModel, Film>(filmViewModel);
 
-            film.Id = filmViewModel.Id;
-            film.Nome = filmViewModel.Nome;
-            film.NumeroInStock = filmViewModel.NumeroInStock;
-            film.Idgenere = filmViewModel.Idgenere;
             film.Disponibilità = (byte)filmViewModel.NumeroInStock;
-            film.ReleaseDate = filmViewModel.ReleaseDate;
             film.DataInserimentoInDatabase = DateTime.Now;
             film.MappingImmaginiFilms = new List<MappingImmaginiFilms>();
 
@@ -116,14 +112,16 @@ namespace Vidly.Controllers
             filmViewModel.ImageLists = new List<SelectList>();
             film.MappingImmaginiFilms = filmViewModel.MappingImmaginiFilms;
 
-            for (int i = 0; i < Costanti.NumberOfProductImages; i++)
-            {
-                filmViewModel.ImageLists.Add(new SelectList(_context.immagineFilms, "ID", "NomeFile",
-                filmViewModel.FilmImages[i]));
-            }
+            
 
             if (film.Id == 0)
             {
+                for (int i = 0; i < Costanti.NumberOfProductImages; i++)
+                {
+                    filmViewModel.ImageLists.Add(new SelectList(_context.immagineFilms, "ID", "NomeFile",
+                    filmViewModel.FilmImages[i]));
+                }
+
                 _context.films.Add(film);
             }
             else

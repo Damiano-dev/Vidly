@@ -28,6 +28,7 @@ namespace Vidly.Models
         [Display(Name = "Data di uscita")]
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        [DataType(DataType.Date)]
         public DateTime ReleaseDate { get; set; }
 
         [Display(Name = "Genere")]

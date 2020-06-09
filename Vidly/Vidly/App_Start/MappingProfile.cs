@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using Vidly.DTOs;
 using Vidly.Models;
+using Vidly.ViewModels;
 
 namespace Vidly.App_Start
 {
@@ -16,6 +17,8 @@ namespace Vidly.App_Start
             Mapper.CreateMap<ClienteDTO, Cliente>().ForMember(c=>c.Id, opt=> opt.Ignore());
             Mapper.CreateMap<Film, FilmDTO>();
             Mapper.CreateMap<FilmDTO, Film>().ForMember(c => c.Id, opt => opt.Ignore());
+            Mapper.CreateMap<FormFilmsViewModel, Film>();
+            Mapper.CreateMap<Film, FormFilmsViewModel>();
             Mapper.CreateMap<TipoAbbonamento, TipoAbbonamentoDTO>();
             Mapper.CreateMap<TipoAbbonamentoDTO, TipoAbbonamento>();
             Mapper.CreateMap<Genere, GenereDTO>();

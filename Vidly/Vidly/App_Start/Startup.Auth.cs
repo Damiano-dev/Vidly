@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -22,6 +23,7 @@ namespace Vidly
             // Consentire all'applicazione di utilizzare un cookie per memorizzare informazioni relative all'utente connesso
             // e per memorizzare temporaneamente le informazioni relative a un utente che accede tramite un provider di accesso di terze parti
             // Configurare il cookie di accesso
+
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
